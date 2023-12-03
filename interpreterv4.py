@@ -133,10 +133,12 @@ class Interpreter(InterpreterBase):
             if obj_ref.type() != Type.OBJECT:
                 super().error(ErrorType.TYPE_ERROR, f"not an object")
             obj_ref_value = obj_ref.value()
-            method = obj_ref_value.get_method(func_name)
-            print(f"     method is {method.type()};{method.value()}")
+            print(f"        {obj_ref_value.fields}")
+            # method = obj_ref_value.get_method(func_name)
+            method = self.get_objects_field_or_method(obj_ref_value,func_name)
+            # print(f"     method is {method.type()};{method.value()}")
             if method is None:
-                super().error(ErrorType.TYPE_ERROR, f"Method {func_name} not found in object {obj_ref}")
+                super().error(ErrorType.NAME_ERROR, f"Method {func_name} not found in object {obj_ref}")
             target_closure = method.value()
             # set the 'this' 
             self.env.set('this',obj_ref)
@@ -158,8 +160,25 @@ class Interpreter(InterpreterBase):
         
    
         return return_val
+    
+    def get_objects_field_or_method(self,obj,name):
+        # check if the method or field exists in the object
+        # print(f"get_objects_field:: obj is {obj.type()} : {obj.value()}")
+        # if name in obj.fields or name in obj.methods:
+        #     return obj.get_attribute(name)
+        print("get_objects_fiels::")
+        attribute = obj.get_attribute(name)
+        if attribute is not None:
+            return attribute
+        if obj.proto is not None:
+            return self.get_objects_field_or_method(obj.proto, name)
+        
+        return None
 
     def __prepare_env_with_closed_variables(self, target_closure, temp_env):
+        print(f"__prepare_env:: capture env is {target_closure.captured_env}")
+        for elem in target_closure.captured_env:
+            print(f"        {elem}")
         for var_name, value in target_closure.captured_env:
             # Updated here - ignore updates to the scope if we
             #   altered a parameter, or if the argument is a similarly named variable
@@ -218,7 +237,7 @@ class Interpreter(InterpreterBase):
 
         print(f"__assign:: assign ast: {assign_ast}")
         if '.' in var_name:
-            obj_name, rhs = var_name.split('.',1)
+            obj_name, attri = var_name.split('.',1)
             print("     it is an object")
             # print(f"    the current stack: {self.env.print_stack()}");
             obj = self.env.get(obj_name)
@@ -230,11 +249,20 @@ class Interpreter(InterpreterBase):
             # evalute the RHS
             value = self.__eval_expr(rhs_ast)
             obj = obj.value()
-            print(f"        assigning {value.type()} to {rhs}")
-            if value.type() == Type.CLOSURE:
-                obj.set_method(rhs,value)
-            else:
-                obj.set_field(rhs, value)
+            print(f"        assigning {value.type()} to {attri}")
+            if attri == 'proto':
+                if value.type() == Type.OBJECT:
+                    print(f"        this is a prototype object")
+                    obj.set_proto(value.value())
+                else:
+                    super().error(
+                ErrorType.TYPE_ERROR, f"It is not a prototype object"
+            )
+            else:        
+                if value.type() == Type.CLOSURE:
+                    obj.set_method(attri,value)
+                else:
+                    obj.set_field(attri, value)
         
         else:
         
@@ -294,20 +322,24 @@ class Interpreter(InterpreterBase):
             )
             
             obj = obj.value()
-            print(f"")
+       
             
             # first try see if its a field attirbute
-            field = obj.get_field(attr_name)
-            if field is not None:
-                print(f"        the field: {field}")
-                return field
+            # field = obj.get_field(attr_name)
+            # if field is not None:
+            #     print(f"        the field: {field}")
+            #     return field
             
-            # if its not a field, then try method
-            method = obj.get_method(attr_name)
-            if method is not None:
-                print(f"        the method: {method}")
-                return method
+            # # if its not a field, then try method
+            # method = obj.get_method(attr_name)
+            # if method is not None:
+            #     print(f"        the method: {method}")
+            #     return method
             
+            attribute = self.get_objects_field_or_method(obj,attr_name)
+            
+            if attribute is not None:
+                return attribute
             
             super().error(
                 ErrorType.NAME_ERROR, f"attribute {attr_name} doesnt exist"
@@ -546,14 +578,14 @@ def main():
     interpreter = Interpreter()
     program1 = """
 func main() {
- c = @;
- /* d captures object c by object reference */ 
- d = lambda() { c.x = 5; };
+  p = @;
 
- d();  
- print(c.x);  /* prints 5, since closure modified original object */
+  c = @;
+  c.proto = p;
+
+  p.x = 10;    /* change proto object after c refers to p */
+  print(c.x);  /* change is visible in c, this prints 10 */
 }
-    
     """
     
     interpreter.run(program1)

@@ -73,10 +73,10 @@ class EnvironmentManager:
                         print(f"        var is: {var}; value type is {value.type()}")
                         obj_content = value.value()
                         print("         fields:")
-                        for attr_name, content in obj_content.field.items():
+                        for attr_name, content in obj_content.fields.items():
                             print(f"            {attr_name}:{content.type()}:{content.value()}")
                         print("         methods:")
-                        for attr_name, content in obj_content.method.items():
+                        for attr_name, content in obj_content.methods.items():
                             print(f"            {attr_name}:{content.type()}:{content.value()}")
                     else:
                         print(f"        var is: {var}; value type is {value.type()}")
