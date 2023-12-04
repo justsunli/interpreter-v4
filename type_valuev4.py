@@ -15,22 +15,27 @@ class Type(Enum):
 
 
 class Closure:
-    def __init__(self, func_ast, env):
-        # self.captured_env = copy.deepcopy(env)
-        # print(f"__init__:: {env.__iter__()}")
+    def __init__(self, func_ast, env, captured_this=None):
         self.captured_env = self.__selective_deepcopy_env(env)
         self.func_ast = func_ast
         self.type = Type.CLOSURE
+        self.captured_this = captured_this
+    
+    def set_this(self, cur_this):
+        self.captured_this = cur_this
         
     def __selective_deepcopy_env(self,env):
         new_env = set()
         
-        print(f"_selective_deepcopy:: {env.__iter__()}")
+        # print(f"_selective_deepcopy:: {env.__iter__()}")
         env_set = env.__iter__()
 
         for (var, value) in env_set:
-            print(f"{var} : {value.type()} : {value.value()}")
+            # print(f"{var} : {value.type()} : {value.value()}")
            
+            if var == 'this':
+                # print(f"skipping copying this")
+                pass
             if value.type() in [Type.CLOSURE, Type.OBJECT]:
                 value_to_capture = value
             else:
@@ -61,6 +66,9 @@ class Object:
     def set_proto(self, parent):
         self.proto = parent
     
+    def get_proto(self):
+        return Value(Type.OBJECT,self.proto)
+    
     def get_attribute(self, name):
         if name in self.fields:
             return self.fields[name]
@@ -69,19 +77,20 @@ class Object:
         else:
             return None
 
-    
-    def get_objects_field_or_method(self,obj,name):
-        # check if the mthod or field exists in the object
-        # print(f"get_objects_field:: obj is {obj.type()} : {obj.value()}")
-        if name in obj.fields or name in obj.methods:
-            return obj.get_attribute(name)
-        
-        if obj.proto is not None:
-            return self.get_objects_field_or_method(obj.proto, name)
-        
-        return None
-    
+    def print_all_attributes(self):
+     
+        for field_name, field_value in self.fields.items():
+            print(f"         Field {field_name}: {field_value.type()} : {field_value.value()}")
 
+        for method_name, method_value in self.methods.items():
+            print(f"         Method {method_name}: {method_value}")
+
+        if self.proto:
+            print("         Proto: Set")
+            # Optionally, you can recursively print the prototype's details
+            self.proto.print_all_attributes()
+        else:
+            print("         Proto: None")
     
 
 

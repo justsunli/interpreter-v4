@@ -1,4 +1,4 @@
-from type_valuev3 import Type, Value
+from type_valuev4 import Type, Value
 
 # The EnvironmentManager class keeps a mapping between each variable name (aka symbol)
 # in a brewin program and the Value object, which stores a type, and a value.
@@ -8,9 +8,10 @@ class EnvironmentManager:
 
     # returns a VariableDef object
     def get(self, symbol):
-        print(f"env::get(): for {symbol}")
+        # print(f"env::get(): for {symbol}")
         for env in reversed(self.environment):
             if symbol in env:
+                # print(f"        returning {env[symbol]} to {symbol}")
                 return env[symbol]
 
         return None
@@ -59,12 +60,7 @@ class EnvironmentManager:
 
     def print_stack(self):
         print("Current call stack:")
-        # for i, frame in enumerate(reversed(self.environment)):
-        #     print(f"Frame {len(self.environment) - i}: {frame}")
 
-        # print("Current call stack (not in reverse):")
-        # for i, frame in enumerate(self.environment):
-        #     print(f"Frame {len(self.environment) - i}: {frame}")
         for i, frame in enumerate(reversed(self.environment), start=1):
             print(f"    Frame {i}::")
             for var, value in frame.items():
@@ -83,27 +79,4 @@ class EnvironmentManager:
                 else:
 
                     print(f"        var is: {var}; value is {value}")
-                # if value.type() == Type.LAMB:
-                #     print(f"        {var}: Lambda Closure")
-                #     funct_ast_val = value.value()
-                #     print(f"            func_ast: {funct_ast_val['func_ast']}")
-
-                #     captured_env = funct_ast_val['captured_env']
-                #     for env_var, env_value in captured_env.items():
-                #         actual_env_value = env_value.value() if hasattr(
-                #             env_value, 'value') else env_value
-                #         # print("entering capture")
-                #         print(
-                #             f"            Captured Env - {env_var}: {actual_env_value}")
-                # else:
-                #     actual_value = value.value() if hasattr(value, 'value') else value
-                #     if isinstance(actual_value, int) or isinstance(actual_value, str):
-
-                #         print(
-                #             f"        int/str:{var}:{actual_value}; id: {id(value)}")
-                #     else:
-                #         print(f"        non-int:{var}:{actual_value}")
-                #         if isinstance(actual_value, dict):
-                #             for key, val in actual_value.items():
-                #                 print(
-                #                     f"        the key is: {key}; the value is: {val}")
+             
