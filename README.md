@@ -1,22 +1,31 @@
-# CS 131 Fall 2023: Project Starter
+# Brewin# Interpreter
 
-Hey there! This is a template repository that contains the necessary boilerplate for [CS 131](https://ucla-cs-131.github.io/fall-23-website/)'s quarter-long project: making an interpreter. The project specs are as follows:
+A quarter-long project for CS 131 - Programming Languages. This project is the final version of a Brewin interpreter that provides supports in some enhanced features of previous Brewin#. 
 
-1. [Project #1 Spec](https://docs.google.com/document/d/1RgPjCH_LtEA-e-SJhtB0hDKn6tMk5YNBcAyhAwFJehc/edit#heading=h.63zoibjlqvny)
+## Key Features
 
-There are three stages to the project; students are currently at the first. Thus, this folder contains the necessary bootstrapping code:
+- [x] **Object Support:** Brewin# introduces objects that can have their own fields and methods without the use of classes.
+- [x] **Prototypal Inheritance:** Objects can inherit from prototype objects, allowing for method and field inheritance across multiple levels.
+- [x] **Enhanced Object Operations:** Objects in Brewin# can be passed as parameters, returned from functions, and compared for equality.
+- [x] **Dynamic Object Management:** Fields and methods can be dynamically added to objects, and the 'this' keyword is supported within methods for referring to the object itself.
 
-- `intbase.py`, the base class and enum definitions for the interpreter
-- `brewparse.py`, which contains the `parse_program` function to parse Brewin programs
-- `brewlex.py`, which contains helper functions for brewparse.py
+## Setup and Execution
 
-Some notes on your submission (for Project 1)
+1. Clone the repository to your local machine.
+2. Ensure Python is installed and navigate to the project directory.
+3. Run the interpreter using a Brewin# program file as input.
 
-1. You **must have a top-level, versioned `interpreterv1.py` file** that **exports the `Interpreter` class**. If not, **your code will not run on our autograder**.
-2. You may also submit one or more additional `.py` modules that your interpreter uses, if you decide to break up your solution into multiple `.py` files.
-3. You **should not modify/submit `intbase.py`, `brewparse.py`, or `brewlex.py`**; we will use our own when grading.
+## Usage Example
 
-You can find out more about our autograder, including how to run it, in [its accompanying repo](https://github.com/UCLA-CS-131/fall-23-autograder).
+```python
+# Example of defining and manipulating objects#
+
+def main() {
+    a = @;  # Creates a new object
+    a.x = 10;  # Adds field 'x' with value 10
+    print(a.x);  # Outputs: 10
+}
+```
 
 ## Licensing and Attribution
 
